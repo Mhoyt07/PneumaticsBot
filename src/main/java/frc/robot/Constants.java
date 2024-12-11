@@ -23,5 +23,6 @@ public final class Constants {
     public static final int right_rev = 1;
     public static final int left_for = 2;
     public static final int left_rev = 3;
+    public static final int moves_per_minute_teleop = 1;
   }
 }
