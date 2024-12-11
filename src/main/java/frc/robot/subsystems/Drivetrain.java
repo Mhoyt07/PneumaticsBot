@@ -16,11 +16,15 @@ public class Drivetrain extends SubsystemBase {
   DoubleSolenoid left_piston;
   DoubleSolenoid.Value value;
   double count;
-  boolean run;
+  boolean run_r;
+  boolean run_l;
+  double scheduler_count;
   public Drivetrain() {
     right_piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.dt.right_for, Constants.dt.right_rev);
     left_piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.dt.left_for, Constants.dt.left_rev);
     count_reset();
+    run_r = true;
+    run_l = true;
   }
 
   public void right(double pos) {
@@ -45,24 +49,28 @@ public class Drivetrain extends SubsystemBase {
     left_piston.set(value);
   }
 
-  public void cycle_right() {
-    if (count % 50 == 0 && run == true) {
+  public void cycle_right(int rate) {
+    //rate is how many times per minute the piston will make an action
+    scheduler_count = 50 / rate;
+    if (count % scheduler_count == 0 && run_r == true) {
       right(0);
-      run = false;
-    } else if (count % 50 == 0 && run == false) {
+      run_r = false;
+    } else if (count % scheduler_count == 0 && run_r == false) {
       right(1);
-      run = true;
+      run_r = true;
     }
     count += 1;
   }
 
-  public void cycle_left() {
-    if (count % 50 == 0 && run == true) {
-      left(0);
-      run = false;
-    } else if (count % 50 == 0 && run == false) {
-      left(1);
-      run = true;
+  public void cycle_left(int rate) {
+    //rate is how many times per minute the piston will make an action
+    scheduler_count = 50 / rate;
+    if (count % scheduler_count == 0 && run_l == true) {
+      right(0);
+      run_l = false;
+    } else if (count % scheduler_count == 0 && run_l == false) {
+      right(1);
+      run_l = true;
     }
     count += 1;
   }

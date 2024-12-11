@@ -5,14 +5,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
 public class PistonPeriodic extends Command {
   /** Creates a new PistonPeriodic. */
   Drivetrain dt;
-  public PistonPeriodic(Drivetrain dt) {
+  int rate_per_minute_r;
+  int rate_per_minute_l;
+  public PistonPeriodic(Drivetrain dt, int rate_per_minute_r, int rate_per_minute_l) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.dt = dt;
+    this.rate_per_minute_r = rate_per_minute_r;
+    this.rate_per_minute_l = rate_per_minute_l;
     addRequirements(this.dt);
   }
 
@@ -25,8 +30,8 @@ public class PistonPeriodic extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    dt.cycle_right();
-    dt.cycle_left();
+    dt.cycle_right(this.rate_per_minute_r);
+    dt.cycle_left(this.rate_per_minute_l);
   }
 
   // Called once the command ends or is interrupted.
