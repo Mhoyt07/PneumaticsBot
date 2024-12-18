@@ -18,13 +18,21 @@ public class Drivetrain extends SubsystemBase {
   double count;
   boolean run_r;
   boolean run_l;
+  boolean run;
   double scheduler_count;
+  
+  public enum side {
+    RIGHT,
+    LEFT
+  }
+
   public Drivetrain() {
     right_piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.dt.right_for, Constants.dt.right_rev);
     left_piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.dt.left_for, Constants.dt.left_rev);
     count_reset();
     run_r = true;
     run_l = true;
+    run = true;
   }
 
   public void right(double pos) {
@@ -49,9 +57,37 @@ public class Drivetrain extends SubsystemBase {
     left_piston.set(value);
   }
 
+  private void piston_set(double pos, side s) {
+    if (pos == 0) {
+      value = DoubleSolenoid.Value.kForward;
+    } else if (pos == 1) {
+      value = DoubleSolenoid.Value.kReverse;
+    } else {
+      value = DoubleSolenoid.Value.kOff;
+    } if (s == side.LEFT) {
+      left_piston.set(value);
+    } else if (s == side.RIGHT) {
+      right_piston.set(value);
+    }
+  }
+
+
+  public void cycle(int rate, side piston) {
+    //rate is how many times per minute the piston will make an action
+    scheduler_count = 300 / rate;
+    if (count % scheduler_count == 0 && run == true) {
+      piston_set(0, piston);
+      run = false;
+    } else if (count % scheduler_count == 0 && run == false) {
+      piston_set(1, piston);
+      run = true;
+    }
+    count += 1;
+  }
+
   public void cycle_right(int rate) {
     //rate is how many times per minute the piston will make an action
-    scheduler_count = 50 / rate;
+    scheduler_count = 300 / rate;
     if (count % scheduler_count == 0 && run_r == true) {
       right(0);
       run_r = false;
@@ -64,12 +100,12 @@ public class Drivetrain extends SubsystemBase {
 
   public void cycle_left(int rate) {
     //rate is how many times per minute the piston will make an action
-    scheduler_count = 50 / rate;
+    scheduler_count = 300 / rate;
     if (count % scheduler_count == 0 && run_l == true) {
-      right(0);
+      left(0);
       run_l = false;
     } else if (count % scheduler_count == 0 && run_l == false) {
-      right(1);
+      left(1);
       run_l = true;
     }
     count += 1;
